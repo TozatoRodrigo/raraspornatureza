@@ -1,0 +1,14 @@
+# Arquivos de sistema operacional
+.DS_Store
+._*
+Thumbs.db
+desktop.ini
+
+# Arquivos de review, skills e pacotes locais
+review/
+site/
+.agents/
+*.zip
+
+# Logs e arquivos temporarios
+*.log
