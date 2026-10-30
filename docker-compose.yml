@@ -1,3 +1,4 @@
+# Sobe o site com Nginx: docker compose up -d (porta 80). Publica só a pasta site/.
 services:
   web:
     image: nginx:alpine
@@ -6,5 +7,5 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./:/usr/share/nginx/html:ro
+      - ./site:/usr/share/nginx/html:ro
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro

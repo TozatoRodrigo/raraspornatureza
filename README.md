@@ -1,65 +1,76 @@
-# Raras por Natureza: Website Oficial
+# Raras por Natureza — site
 
-Site institucional com experiência cinematográfica em scroll-scrub desenvolvido para a **Raras por Natureza** (coleção particular de plantas raras em Maringá, PR).
+Site da Raras por Natureza (plantas raras de coleção, Maringá – PR): uma página só, com a abertura em que a folha
+da logo se desenha e vira uma janela para o vídeo do Anthurium, a lista de plantas à venda em cartões, o passo a
+passo de compra, guias de cultivo, perguntas frequentes e contato.
 
----
+HTML, CSS e JavaScript puros: sem framework, sem banco de dados e sem etapa de build para publicar. Qualquer
+servidor de arquivos estáticos serve o site.
 
-## Estrutura do Repositório
+## O que tem aqui
 
 ```text
-├── index.html          # Código-fonte principal da página (HTML5, CSS3 e JS Vanilla)
-├── assets/             # Mídias otimizadas (vídeo hero e imagens botânicas)
-│   ├── hero-scrub.mp4  # Vídeo codificado para rolagem suave (GOP 8)
-│   ├── hero-poster.jpg # Frame de abertura em alta resolução
-│   ├── hero-ending.jpg # Frame de transição final
-│   ├── anthurium.jpg   # Fotografia Anthurium
-│   ├── monstera.jpg    # Fotografia Monstera deliciosa
-│   ├── platycerium.jpg # Fotografia Platycerium superbum
-│   └── cuidado.jpg     # Fotografia de cuidados e raízes
-├── nginx.conf          # Configuração recomendada para Nginx / VPS
-├── docker-compose.yml  # Configuração para subir com Docker em 1 comando
-└── .htaccess           # Configuração de cache e compressão para Apache / cPanel
+site/        o site pronto: é esta pasta que vai para o servidor
+  index.html
+  estilo.css, app.js
+  img/, video/, og.jpg (imagem que aparece ao compartilhar o link), favicon.svg
+  robots.txt, sitemap.xml, .htaccess (Apache/cPanel), vercel.json (Vercel)
+fonte/       para atualizar a lista de plantas e gerar o index.html de novo
+  catalogo.mjs   a lista de plantas (nome, nome científico, descrição, preço, porte)
+  pagina.html    o modelo da página
+  montar.mjs     junta tudo e grava site/index.html
+  folha.mjs      o desenho da folha da logo em SVG
+nginx.conf, docker-compose.yml   exemplo para publicar numa VPS com Nginx
 ```
 
----
+## Como atualizar a lista de plantas
 
-## Como Publicar no Domínio do Cliente
+1. Abra `fonte/catalogo.mjs`. Cada planta é uma linha:
 
-Este site foi construído sem dependências de compilação (sem npm, sem frameworks, sem build step). Qualquer servidor web estático serve o site imediatamente.
+   ```js
+   ['anthurium-luxurians-inhotim', 'Anthurium Luxurians', 'Anthurium luxurians', 'Folhagem enrugada e texturizada…', 700, 'grande, linhagem Inhotim'],
+   ```
 
-### Opção 1: Hospedagem com cPanel (HostGator, Locaweb, etc.)
-1. Acesse o painel **cPanel** da sua hospedagem.
-2. Abra o **Gerenciador de Arquivos**.
-3. Navegue até a pasta raiz do seu domínio (geralmente `public_html`).
-4. Envie o arquivo `index.html`, a pasta `assets` e o arquivo `.htaccess`.
-5. Pronto! O site estará no ar no seu domínio com carregamento rápido e streaming do vídeo ativo.
+   Na ordem: um identificador sem espaço nem acento, o nome, o nome científico, a descrição curta, o preço em reais
+   e, se quiser, o porte. Para tirar uma planta, apague a linha; para incluir, copie uma linha e troque os dados.
+   O filtro do site sai da primeira palavra do nome (Aglaonema, Alocasia, Anthurium, Begonia, Monstera,
+   Philodendron, Platycerium; o resto entra em "Outras").
+2. Troque a data em `atualizadaEm` (ela aparece em cima da lista).
+3. Na raiz do projeto, rode (precisa do Node.js 18 ou mais novo):
 
-### Opção 2: Vercel / Netlify / Cloudflare Pages / GitHub Pages
-1. Conecte este repositório do GitHub à sua conta da plataforma (Vercel, Netlify ou Cloudflare Pages).
-2. Deixe o diretório raiz como `/` (já está configurado na raiz).
-3. Não é necessário nenhum comando de build nem pasta de saída (`output`).
-4. Clique em **Deploy**. O site será publicado automaticamente com HTTPS gratuito e CDN global.
+   ```bash
+   node fonte/montar.mjs
+   ```
 
-### Opção 3: VPS ou Servidor na Nuvem com Docker
-Se você utiliza um servidor Linux próprio (DigitalOcean, Hetzner, AWS, Linode, etc.):
-```bash
-git clone https://github.com/TozatoRodrigo/raraspornatureza.git
-cd raraspornatureza
-docker compose up -d
-```
-O container iniciará o servidor Nginx otimizado na porta 80.
+4. Publique a pasta `site/` de novo.
 
-### Opção 4: Teste Local no Computador
-Para visualizar no seu computador antes de subir:
-```bash
-python3 -m http.server 8080
-```
-Depois abra no seu navegador: `http://localhost:8080`.
+O `montar.mjs` também atualiza os dados estruturados do Google (lista de ofertas com preço, perguntas frequentes,
+horário e contato da loja). O WhatsApp e o Instagram estão em `fonte/montar.mjs`, `fonte/pagina.html` e `site/app.js`.
 
----
+## Como publicar
 
-## Características Técnicas
+O endereço oficial configurado é `https://www.raraspornatureza.com.br` (link canônico, imagem de compartilhamento
+e dados do Google). Se o site for para outro endereço, rode `node fonte/montar.mjs --url https://outro-endereco`.
 
-- **Scroll Scrub Suave**: Vídeo hero sincronizado com a rolagem do usuário via Lerp (`requestAnimationFrame`) e seek-gating de precisão.
-- **Responsividade Adaptativa**: 5 travas de mídia automáticas que comutam de vídeo para imagem de alta resolução em conexões móveis, economizando dados e bateria.
-- **Auditoria de Cópia**: Texto 100% em português brasileiro autêntico, sem clichês genéricos e com tipografia refinada (Cinzel e Plus Jakarta Sans).
+**VPS com Nginx (como o servidor atual):** copie o conteúdo de `site/` para a raiz do site no servidor. As pastas
+que já existem lá e não fazem parte deste projeto (`/blog/`, `/gestao/`) continuam funcionando: a página tem links
+para os guias do blog. O `nginx.conf` deste projeto é um exemplo de configuração (compressão, cache, vídeo e
+bloqueio de arquivos ocultos).
+
+**Docker:** `docker compose up -d` sobe um Nginx na porta 80 servindo só a pasta `site/`.
+
+**Hospedagem com cPanel:** envie o conteúdo de `site/` (incluindo o `.htaccess`) para `public_html`.
+
+**Vercel, Netlify ou Cloudflare Pages:** conecte o repositório e use `site` como pasta raiz, sem comando de build.
+
+Depois de publicar, vale mandar o `sitemap.xml` no Google Search Console.
+
+## Bom saber
+
+- Os vídeos tocam só quando aparecem na tela e a página respeita quem desativa animações no celular: nesse caso
+  ela aparece parada e completa.
+- A lista que o visitante monta fica salva no navegador dele e vai pronta para o WhatsApp da loja, com o total e a
+  cidade para o frete.
+- Fontes: Cormorant Garamond e Hanken Grotesk, carregadas do Google Fonts.
+
+Site por [Strivium Tech](https://www.striviumtech.com.br).
